@@ -23,12 +23,8 @@ const MIDI_NUMS = ["21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "
 
 const WHITE_KEY_WIDTH = 10;
 const WHITE_KEY_HEIGHT = 59;
+const GAP_FACTOR = 1.2;
 
 const BLACK_KEY_WIDTH = WHITE_KEY_WIDTH * 0.7;
 const BLACK_KEY_HEIGHT = WHITE_KEY_HEIGHT * 0.7;
 const BLACK_KEY_OVERLAP = BLACK_KEY_WIDTH / 3;
-
-const GAP_FACTOR = 1.2;
-
-// const PIANO_WIDTH = 52 * WHITE_KEY_WIDTH * GAP_FACTOR; // 52 is the number of white keys on a standard 88-key piano.
-// const PIANO_HEIGHT = WHITE_KEY_HEIGHT;
