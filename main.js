@@ -5,9 +5,12 @@
 
 function main() {
     const piano = document.getElementById("piano");
-    const keys = [];
 
+    const keys = [];
     createKeys(piano, keys);
+
+    const playButton = document.getElementById("play-button");
+    playButton.addEventListener("click", playAction);
 }
 
 /*
@@ -23,17 +26,17 @@ function createKeys(piano, keys) {
 
     for (let n = 0; n < NOTES.length; n++) {
         const key = document.createElement("div");  // Using div to avoid pre-made border on img elements.
-        const note = NOTES[n];
-        const midi = MIDI_NUMS[n];
+        key.note = NOTES[n];
+        key.midi = MIDI_NUMS[n];
 
         key.style.position = "absolute";
 
-        if (note.includes("#")) {                   // Black keys.
+        if (key.note.includes("#")) {
             key.classList.add("black-key");
             key.style.left = (lastWhiteX + WHITE_KEY_WIDTH - BLACK_KEY_OVERLAP) + "px";
             key.style.bottom = (WHITE_KEY_HEIGHT - BLACK_KEY_HEIGHT) + "px";
         }
-        else {                                      // White keys.
+        else {
             key.classList.add("white-key");
             lastWhiteX = numWhite * WHITE_KEY_WIDTH * GAP_FACTOR;
             key.style.left = lastWhiteX + "px";
@@ -41,9 +44,6 @@ function createKeys(piano, keys) {
 
             numWhite++;
         }
-
-        key.dataset.note = note;
-        key.dataset.midi = midi;
 
         keys.push(key);
         piano.appendChild(key);
