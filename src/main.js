@@ -6,11 +6,7 @@
 import * as C from './constants.js';
 import './style.css';
 
-const SONG = [ // Just some C's to test playing functionality.
-    {time: 0.0, midi: 60},
-    {time: 0.5, midi: 72},
-    {time: 1.0, midi: 84}
-];
+import MidiParser from "midi-parser-js";
 
 function main() {
     const piano = document.getElementById("piano");
@@ -22,6 +18,7 @@ function main() {
 
     layKeys(piano, keys);
     mapMIDI();
+    loadComposition();
 
     /*
      * Function: mapMIDI
@@ -55,6 +52,19 @@ function main() {
         }
     }
     playButton.addEventListener("click", playAction);
+}
+
+/*
+ * Function: loadComposition
+ * -------------------------
+ * Fetches MIDI file and parses composition into JSON.
+ */
+async function loadComposition() {
+    const response = await fetch("/public/brahmsUngarischerTanzNo1.mid");
+    const arrayBuffer = await response.arrayBuffer();
+
+    let composition = MidiParser.parse(new Uint8Array(arrayBuffer));
+    console.log(composition);
 }
 
 /*
