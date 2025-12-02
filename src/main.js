@@ -60,8 +60,13 @@ async function main() {
             if (!buffer) continue;
 
             const src = audioC.createBufferSource();
+            const gainNode = audioC.createGain();
+
             src.buffer = buffer;
-            src.connect(audioC.destination);
+            gainNode.gain.value = action.gain;
+            
+            src.connect(gainNode);
+            gainNode.connect(audioC.destination);
             src.start(beginning + action.startTime);
 
             const offIdxRel = song.slice(index).findIndex(
@@ -71,7 +76,6 @@ async function main() {
             
             action.endTime = song[index + offIdxRel].startTime;
             action.duration = action.endTime - action.startTime;
-            //src.stop(beginning + action.endTime); // Based on how it sounds (:/) will use end time / duration solely for visuals.
         }
     }
     playButton.addEventListener("click", playAction);
@@ -127,7 +131,7 @@ function getAction(obj, event, absTick) {
         event.type === 8 || velocity === 0 ? "off" :
         null;
 
-    return {midi, velocity, startTime: absTime, type};
+    return {midi, gain: Math.pow(velocity / 127, 2), startTime: absTime, type}; // Normalize and square velocity of note.
 }
 
 /*
