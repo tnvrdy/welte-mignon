@@ -54,7 +54,7 @@ async function main() {
     function playAction() {
         const beginning = audioC.currentTime + 0.1;
 
-        for (let action of song) {
+        for (let [index, action] of song.entries()) {
             if (action.type !== "on") continue;
             const buffer = bufferToMIDI[action.midi];
             if (!buffer) continue;
@@ -63,6 +63,15 @@ async function main() {
             src.buffer = buffer;
             src.connect(audioC.destination);
             src.start(beginning + action.startTime);
+
+            const offIdxRel = song.slice(index).findIndex(
+                a => a.type === "off" && a.midi === action.midi
+            );
+            if (offIdxRel === -1) continue;
+            
+            action.endTime = song[index + offIdxRel].startTime;
+            action.duration = action.endTime - action.startTime;
+            //src.stop(beginning + action.endTime); // Based on how it sounds (:/) will use end time / duration solely for visuals.
         }
     }
     playButton.addEventListener("click", playAction);
@@ -118,7 +127,7 @@ function getAction(obj, event, absTick) {
         event.type === 8 || velocity === 0 ? "off" :
         null;
 
-    return {startTime: absTime, midi, type};
+    return {midi, velocity, startTime: absTime, type};
 }
 
 /*
