@@ -28,7 +28,7 @@ export function parseNotes(obj) {
     const events = obj.track[0].event;                          // Assumes type 0 MIDI file.          
     let notes = [];
     let absTick = 0;
-    let activeNotes = new Map();
+    let notesOn = new Map();
 
     for (let event of events) {
         absTick += event.deltaTime;
@@ -37,18 +37,18 @@ export function parseNotes(obj) {
         const {midi, type, gain, startTime} = getAction(obj, event, absTick);
 
         if (type === "on") {
-            if (!activeNotes.has(midi)) activeNotes.set(midi, []);
-            activeNotes.get(midi).push({startTime, gain});
+            if (!notesOn.has(midi)) notesOn.set(midi, []);
+            notesOn.get(midi).push({startTime, gain});
         } else if (type === "off") {
-            const activeStack = activeNotes.get(midi);
-            if (!activeStack || activeStack.length === 0) continue;
+            const onStack = notesOn.get(midi);
+            if (!onStack || onStack.length === 0) continue;
 
-            const {startTime: onTime, gain} = activeStack.pop(); // Note-on event that pairs with this note-off event.
-            const endTime = startTime;                           // End time of note is start time of note-off event.
+            const {startTime: onTime, gain} = onStack.pop();    // Note-on event that pairs with this note-off event.
+            const endTime = startTime;                          // End time of note is start time of note-off event.
             notes.push({
                 midi, 
                 gain, 
-                startTime: onTime,                               // Start time of note is start time of note-on event.
+                startTime: onTime,                              // Start time of note is start time of note-on event.
                 endTime, 
                 duration: endTime - onTime
             });
