@@ -34,3 +34,5 @@ export const GAP_FACTOR = 1.2;
 export const BLACK_KEY_WIDTH = WHITE_KEY_WIDTH * 0.7;
 export const BLACK_KEY_HEIGHT = WHITE_KEY_HEIGHT * 0.7;
 export const BLACK_KEY_OVERLAP = BLACK_KEY_WIDTH / 3;
+
+export const ROLL_SPEED = 80;

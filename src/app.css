@@ -14,7 +14,7 @@ body {
   position: absolute;
   width: 10px;
   height: 59px;
-  z-index: 1;
+  z-index: 2;
   background-image: url("/images/whiteKey.jpeg");
 }
 
@@ -22,6 +22,19 @@ body {
   position: absolute;
   width: 7px;
   height: 41.3px;
-  z-index: 2;
+  z-index: 3;
   background-image: url("/images/blackKey.jpeg");
+}
+
+.roll {
+  position: absolute;
+  /*  */
+  overflow: hidden;
+  z-index: 1;
+}
+
+.tile {
+  position: absolute;
+  width: 10px;
+  background: #FFFFF0;
 }
