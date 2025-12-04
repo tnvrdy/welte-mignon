@@ -24,9 +24,9 @@ export async function loadMidi(mf) {
  * Accepts midi data object and parses, from its
  * events, the actions necessary to play the piece.
  */
-export function parseComposition(obj) {             
-    const comp = [];
-    const events = obj.track[0].event;              // Assumes type 0 MIDI file.
+export function parseComposition(obj) { 
+    const events = obj.track[0].event;               
+    let comp = [];           // Assumes type 0 MIDI file.
     let absTick = 0;
 
     for (let event of events) {
@@ -35,6 +35,18 @@ export function parseComposition(obj) {
             comp.push(getAction(obj, event, absTick));
         }
     }
+
+    comp = comp.reduce((acc, action, index, arr) => {
+        if (action.type !== "on") return acc;
+        
+        const noteOff = arr.slice(index).find(
+          a => a.type === "off" && a.midi === action.midi
+        );
+        action.endTime = noteOff.startTime;
+        action.duration = action.endTime - action.startTime;
+        acc.push(action);
+        return acc;
+      }, []);
 
     return comp;
 }
@@ -58,10 +70,10 @@ function getAction(obj, event, absTick) {
         null;
 
     return {
-        midi, 
+        midi,
+        type,
         gain: Math.pow(velocity / 127, 2),          // Normalize and square velocity of note.
         startTime: absTime, 
-        type
     };
 }
 
@@ -100,30 +112,21 @@ export async function initAudio(keys) {
  * and map of MIDI numbers to audio buffers,
  * to play piece upon user clicking "play".
  */
-export function playAction(audioC, comp, bufferToMIDI) {
+export function playAction(audioC, notes, bufferToMIDI) {
     const beginning = audioC.currentTime + 0.1;
 
-    for (let [index, action] of comp.entries()) {
-        if (action.type !== "on") continue;
-        const buffer = bufferToMIDI[action.midi];
+    for (let note of notes) {
+        const buffer = bufferToMIDI[note.midi];
         if (!buffer) continue;
 
         const src = audioC.createBufferSource();
         const gainNode = audioC.createGain();
 
         src.buffer = buffer;
-        gainNode.gain.value = action.gain;
+        gainNode.gain.value = note.gain;
         
         src.connect(gainNode);
         gainNode.connect(audioC.destination);
-        src.start(beginning + action.startTime);
-
-        const offIdxRel = comp.slice(index).findIndex(
-            a => a.type === "off" && a.midi === action.midi
-        );
-        if (offIdxRel === -1) continue;
-        
-        action.endTime = comp[index + offIdxRel].startTime;
-        action.duration = action.endTime - action.startTime;
+        src.start(beginning + note.startTime);
     }
 }

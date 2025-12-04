@@ -9,7 +9,6 @@
   let audioC = null;
   let bufferToMIDI = {};
   
-  // migrated layKeys()
   /*
    * Function: createKeys
    * --------------------
@@ -29,8 +28,7 @@
       let leftX = null;
       if (isBlack) {               // "b" indicates a flat.
         leftX = lastWhiteX + C.WHITE_KEY_WIDTH - C.BLACK_KEY_OVERLAP;
-      }
-      else {
+      } else {
         leftX = numWhite * C.WHITE_KEY_WIDTH * C.GAP_FACTOR;
         lastWhiteX = leftX;
         numWhite++;
@@ -42,11 +40,9 @@
     return keys;
   }
 
-  // migrated main()
   onMount(async () => {
     keys = createKeys();
-    const midiFile = "/brahmsUngarischerTanzNo1.mid";
-    const midiData = await loadMidi(midiFile);
+    const midiData = await loadMidi("/brahmsUngarischerTanzNo1.mid");
     composition = parseComposition(midiData);
     
     const audioEngine = await initAudio(keys);
@@ -54,13 +50,11 @@
     bufferToMIDI = audioEngine.bufferToMIDI;
   });
 
-  // migrated click event listening
   function onClickPlay() {
     playAction(audioC, composition, bufferToMIDI);
   }
 </script>
 
-<!-- migrated piano div -->
 <main class="app-root">
   <div id="piano">
     {#each keys as key}
