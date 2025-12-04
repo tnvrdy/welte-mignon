@@ -25,7 +25,7 @@ export async function loadMidi(mf) {
  * events, the actions necessary to play the piece.
  */
 export function parseNotes(obj) { 
-    const events = obj.track[0].event;                  // Assumes type 0 MIDI file.          
+    const events = obj.track[0].event;                          // Assumes type 0 MIDI file.          
     let notes = [];
     let absTick = 0;
     let activeNotes = new Map();
@@ -43,14 +43,14 @@ export function parseNotes(obj) {
             const activeStack = activeNotes.get(midi);
             if (!activeStack || activeStack.length === 0) continue;
 
-            const {startTime, gain} = activeStack.pop(); // Note-on event that pairs with this note-off event.
-            const endTime = startTime;
+            const {startTime: onTime, gain} = activeStack.pop(); // Note-on event that pairs with this note-off event.
+            const endTime = startTime;                           // End time of note is start time of note-off event.
             notes.push({
                 midi, 
                 gain, 
-                startTime, 
+                startTime: onTime,                               // Start time of note is start time of note-on event.
                 endTime, 
-                duration: endTime - startTime
+                duration: endTime - onTime
             });
         }
     }
@@ -66,8 +66,8 @@ export function parseNotes(obj) {
  * start time, and/or type (on/off)).
  */
 function getAction(obj, event, absTick) {
-    const ppq = obj.timeDivision;                       // Pulses per quarter note.
-    const absTime = absTick * (C.MPQ / 1e6 / ppq);      // Calculates absolute time in seconds from ticks.
+    const ppq = obj.timeDivision;                               // Pulses per quarter note.
+    const absTime = absTick * (C.MPQ / 1e6 / ppq);              // Calculates absolute time in seconds from ticks.
 
     const [midi, velocity] = event.data;
     const type =
@@ -78,7 +78,7 @@ function getAction(obj, event, absTick) {
     return {
         midi,
         type,
-        gain: Math.pow(velocity / 127, 2),              // Normalize and square velocity of note.
+        gain: Math.pow(velocity / 127, 2),                      // Normalize and square velocity of note.
         startTime: absTime, 
     };
 }
