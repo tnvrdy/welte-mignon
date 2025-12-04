@@ -43,12 +43,12 @@ export function parseNotes(obj) {
             const activeStack = activeNotes.get(midi);
             if (!activeStack || activeStack.length === 0) continue;
 
-            const {onTime, onGain} = activeStack.pop(); // Note-on event that pairs with this note-off event.
+            const {startTime, gain} = activeStack.pop(); // Note-on event that pairs with this note-off event.
             const endTime = startTime;
             notes.push({
                 midi, 
-                gain: onGain, 
-                startTime: onTime, 
+                gain, 
+                startTime, 
                 endTime, 
                 duration: endTime - startTime
             });
