@@ -1,5 +1,7 @@
 body {
-  background-color: #d0c5b3;
+  background-image: url('/images/background.jpg'); /* Replace with your image path */
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .container {
