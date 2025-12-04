@@ -85,4 +85,7 @@
   </div>
 
   <button id="play-button" on:click={onClickPlay}>Play</button>
+  <h3>. ݁₊ ⊹ . ݁˖ . Steinway Welte-Mignon . ݁₊ ⊹ . ݁˖ . 
+    <br>⋆⭒˚.⋆ Reproducing Piano ⋆⭒˚.⋆
+  </h3>
 </main>
