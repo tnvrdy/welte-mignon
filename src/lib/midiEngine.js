@@ -19,36 +19,36 @@ export async function loadMidi(mf) {
 }
 
 /*
- * Function: parseComposition
+ * Function: parseNotes
  * --------------------------
  * Accepts midi data object and parses, from its
  * events, the actions necessary to play the piece.
  */
-export function parseComposition(obj) { 
-    const events = obj.track[0].event;               
-    let comp = [];           // Assumes type 0 MIDI file.
+export function parseNotes(obj) { 
+    const events = obj.track[0].event; // Assumes type 0 MIDI file.          
+    let notes = [];
     let absTick = 0;
+    let activeNotes = new Map();
 
     for (let event of events) {
         absTick += event.deltaTime;
-        if (event.data?.length === 2) {
-            comp.push(getAction(obj, event, absTick));
+        if (!event.data || event.data.length !== 2) continue;
+
+        const {midi, type, gain, startTime} = getAction(obj, event, absTick);
+
+        if (type === "on") {
+            if (!activeNotes.has(midi)) activeNotes.set(midi, []);
+            activeNotes.get(midi).push({startTime, gain});
+        } else if (type === "off") {
+            const activeStack = activeNotes.get(midi);
+            if (!activeStack || activeStack.length === 0) continue;
+
+            const {onTime, onGain} = activeStack.pop(); // Note-on event that pairs with this note-off event.
+            const endTime = startTime;
+            notes.push({midi, gain: onGain, startTime: onTime, endTime, duration: endTime - startTime});
         }
     }
-
-    comp = comp.reduce((acc, action, index, arr) => {
-        if (action.type !== "on") return acc;
-        
-        const noteOff = arr.slice(index).find(
-          a => a.type === "off" && a.midi === action.midi
-        );
-        action.endTime = noteOff.startTime;
-        action.duration = action.endTime - action.startTime;
-        acc.push(action);
-        return acc;
-      }, []);
-
-    return comp;
+    return notes;
 }
 
 /*

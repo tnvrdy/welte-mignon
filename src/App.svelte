@@ -2,10 +2,10 @@
   import {onMount} from 'svelte';
   import * as C from './lib/constants.js';
   import './app.css';
-  import {loadMidi, parseComposition, initAudio, playAction} from './lib/midiEngine.js';
+  import {loadMidi, parseNotes, initAudio, playAction} from './lib/midiEngine.js';
 
   let keys = [];
-  let composition = [];
+  let notes = [];
   let audioC = null;
   let bufferToMIDI = {};
   
@@ -43,7 +43,7 @@
   onMount(async () => {
     keys = createKeys();
     const midiData = await loadMidi("/brahmsUngarischerTanzNo1.mid");
-    composition = parseComposition(midiData);
+    notes = parseNotes(midiData);
     
     const audioEngine = await initAudio(keys);
     audioC = audioEngine.audioC;
@@ -51,7 +51,7 @@
   });
 
   function onClickPlay() {
-    playAction(audioC, composition, bufferToMIDI);
+    playAction(audioC, notes, bufferToMIDI);
   }
 </script>
 
